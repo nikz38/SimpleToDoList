@@ -15,6 +15,10 @@ import MainTabNavigator from '../navigation/MainTabNavigator';
 import { StackNavigator } from 'react-navigation';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { addListItemRequest } from '../redux/actions/listActions';
+
 
 firebase.initializeApp({
     apiKey: "AIzaSyAaZ0BZHEnpG0J8bKcEBilsXKkQtZdyNjc",
@@ -26,7 +30,7 @@ firebase.initializeApp({
 });
 
 
-export default class LoginScreen extends React.Component {
+class LoginScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {email: '', password: '', error: '', isLogged: false, loading: false};
@@ -118,7 +122,32 @@ export default class LoginScreen extends React.Component {
                     {this.state.isLogged ? 'logged' : 'not logged'}
                 </Text>
                 {this.renderButtonOrLoading()}
+
+                <TouchableOpacity  onPress={this.props.testAction}>
+                    <Text>reduuux teeest</Text>
+                </TouchableOpacity>
+                <Text>{this.props.listReducer.data}</Text>
             </View>
         )
     }
 }
+
+function mapStateToProps(state) {
+    const { listReducer } = state;
+    console.log(state)
+    return {
+        listReducer
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    //this () => dispatch(testRequest()) should be the same as bindActionCreators(testRequest, dispatch)
+    return {
+        testAction: () => dispatch(addListItemRequest())
+    }
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(LoginScreen)
