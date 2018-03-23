@@ -8,39 +8,56 @@ import {
 
 export default function listReducer(state = initialState, action) {
     switch(action.type) {
-        case types.ADD_LIST_REQUEST:
+        case types.LOGIN_REQUEST:
             return {
                 ...state,
                 ...requestState
             }
-        case types.ADD_LIST_SUCCESS:
+        case types.LOGIN_SUCCESS:
             return {
                 ...state,
                 ...successState,
-                data: action.payload
+                user: action.payload
             }
-        case types.ADD_LIST_FAILURE:
+        case types.LOGIN_FAILURE:
             return {
                 ...state,
                 ...failureState,
                 error: action.payload.message
             }
-        case types.GET_LISTS_REQUEST:
+        case types.LOGOUT_REQUEST:
             return {
                 ...state,
                 ...requestState
             }
-        case types.GET_LISTS_SUCCESS:
+        case types.LOGOUT_SUCCESS:
             return {
                 ...state,
                 ...successState,
-                lists: action.payload
+                user: null
             }
-        case types.GET_LISTS_FAILURE:
+        case types.LOGOUT_FAILURE:
             return {
                 ...state,
                 ...failureState,
                 error: action.payload.message
+            }
+        case types.REGISTER_REQUEST:
+            return {
+                ...state,
+                ...requestState
+            }
+        case types.REGISTER_SUCCESS:
+            return {
+                ...state,
+                ...successState,
+                user: action.payload
+            }
+        case types.REGISTER_FAILURE:
+            return {
+                ...state,
+                ...failureState,
+                error: action.message
             }
         default:
             return state

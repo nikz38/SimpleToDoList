@@ -10,6 +10,7 @@ import {
     View,
 } from 'react-native';
 
+import { NavigationActions } from 'react-navigation'
 import * as firebase from 'firebase';
 import MainTabNavigator from '../navigation/MainTabNavigator';
 import { StackNavigator } from 'react-navigation';
@@ -18,94 +19,58 @@ import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elemen
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { addListItemRequest } from '../redux/actions/listActions';
+import List from '../screens/ListScreen'
+import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
 
 
-firebase.initializeApp({
-    apiKey: "AIzaSyAaZ0BZHEnpG0J8bKcEBilsXKkQtZdyNjc",
-    authDomain: "simple-todo-list-996ef.firebaseapp.com",
-    databaseURL: "https://simple-todo-list-996ef.firebaseio.com",
-    projectId: "simple-todo-list-996ef",
-    storageBucket: "simple-todo-list-996ef.appspot.com",
-    messagingSenderId: "394433554678"
+const resetAction = NavigationActions.reset({
+    index: 0,
+    actions: [
+        NavigationActions.navigate({routeName: 'List'})
+    ]
 });
 
 
 class LoginScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {email: '', password: '', error: '', isLogged: false, loading: false};
+        this.state = {email: '', password: ''};
 
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
-                this.setState({isLogged: true});
+                if (!this.props.authReducer.user) {
+                    this.props.loginSuccessAction(user);
+                }
+                this.props.navigation.dispatch(resetAction);
 
-            } else {
-                this.setState({isLogged: false});
             }
-        });
-    }
 
-    logIn() {
-        this.setState({error: '', loading: true});
-        const {email, password} = this.state;
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(
-                () => {
-                    this.setState({error: '', loading: false});
-                    // this.props.navigation.navigate('Main');
-                }
-            )
-            .catch(
-                (error) => {
-                    this.setState({error: error.message, loading: false});
-                }
-            )
-    }
-
-    signUp() {
-        this.setState({error: '', loading: true});
-        const {email, password} = this.state;
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(
-                () => {
-                    this.setState({error: '', loading: false});
-                    this.props.navigation.navigate('Main');
-                }
-            )
-            .catch(
-                (error) => {
-                    this.setState({error: error.message, loading: false});
-                }
-            )
-    }
-
-    logOut() {
-        firebase.auth().signOut().then(() => {
-            // Sign-out successful.
-        }, function(error) {
-            // An error happened.
         });
     }
 
     renderButtonOrLoading() {
-        if (this.state.loading) {
+        if (this.props.authReducer.isFetching) {
             return <Text>Loading...</Text>
         }
 
         return (
             <View>
-                <Button onPress={this.logIn.bind(this)} title='Login'/>
-                <Button onPress={this.signUp.bind(this)} title='Sign Up'/>
-                <Button onPress={this.logOut.bind(this)} title='Logout'/>
+                {!this.props.authReducer.user &&
+                <Button onPress={() => this.props.loginAction(this.state.email, this.state.password)} title='Login'/>}
+                {!this.props.authReducer.user &&
+                <Button onPress={() => this.props.registerAction(this.state.email, this.state.password)}
+                        title='Sign Up'/>}
+                {this.props.authReducer.user && <Button onPress={() => this.props.logOutAction()} title='Logout'/>}
             </View>
         )
     }
 
-        render() {
+    render() {
         return (
             <View>
                 <FormLabel>Email</FormLabel>
                 <FormInput
+                    autoCapitalize='none'
                     value={this.state.email}
                     placeholder='john@doe.com'
                     onChangeText={email => this.setState({email})}/>
@@ -116,34 +81,40 @@ class LoginScreen extends React.Component {
                     placeholder='******'
                     onChangeText={password => this.setState({password})}/>
                 <FormValidationMessage>
-                    {this.state.error}
+                    {this.props.authReducer.error}
                 </FormValidationMessage>
-                <Text>
-                    {this.state.isLogged ? 'logged' : 'not logged'}
-                </Text>
                 {this.renderButtonOrLoading()}
-
-                <TouchableOpacity  onPress={this.props.testAction}>
-                    <Text>reduuux teeest</Text>
-                </TouchableOpacity>
-                <Text>{this.props.listReducer.data}</Text>
+                {this.props.authReducer.user &&
+                <Text>
+                    {this.props.authReducer.user.uid}
+                </Text>}
             </View>
         )
     }
 }
 
 function mapStateToProps(state) {
-    const { listReducer } = state;
-    console.log(state)
+    const {authReducer} = state;
+    console.log(state);
     return {
-        listReducer
+        authReducer
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    //this () => dispatch(testRequest()) should be the same as bindActionCreators(testRequest, dispatch)
     return {
-        testAction: () => dispatch(addListItemRequest())
+        loginAction: (email, password) => {
+            dispatch(loginRequest({email: email, password: password}))
+        },
+        loginSuccessAction: (user) => {
+            dispatch(loginSuccess(user))
+        },
+        logOutAction: () => {
+            dispatch(logoutRequest())
+        },
+        registerAction: (email, password) => {
+            dispatch(registerRequest({email: email, password: password}))
+        },
     }
 }
 

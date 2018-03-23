@@ -2,7 +2,7 @@ export const initialState = {
     isFetching: false,
     failure: false,
     success: false,
-    data: null
+    error: null
 };
 
 export const requestState = {
@@ -15,7 +15,8 @@ export const requestState = {
 export const successState = {
     isFetching: false,
     failure: false,
-    success: true
+    success: true,
+    error: null
 }
 
 export const failureState = {
