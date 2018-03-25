@@ -6,12 +6,14 @@ import { connect } from 'react-redux';
 import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
 import { addListRequest, getListsRequest } from '../redux/actions/listActions';
 import { FormLabel, FormInput, FormValidationMessage, List, ListItem } from 'react-native-elements';
+import { StackNavigator } from 'react-navigation';
 
 const resetAction = NavigationActions.reset({
     index: 0,
     actions: [
         NavigationActions.navigate({routeName: 'Login'})
     ]
+
 });
 
 class ListScreen extends React.Component {
@@ -22,6 +24,8 @@ class ListScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {listTitle: ''};
+        this.longPressOptions = this.longPressOptions.bind(this);
+
     }
 
     componentDidMount() {
@@ -35,9 +39,14 @@ class ListScreen extends React.Component {
     }
 
     renderLists() {
-        return Object.keys(this.props.listReducer.lists).map( (list, index) => {
-            return <ListItem key={index} title={this.props.listReducer.lists[list].title}></ListItem>
+        const {lists} = this.props.listReducer;
+        return Object.keys(lists).map( (list, index) => {
+            return <ListItem key={index} onLongPress={this.longPressOptions.bind(this,Object.keys(lists)[index], lists[list].title)} title={lists[list].title}></ListItem>
         })
+    }
+
+    longPressOptions(listId, title) {
+        this.props.navigation.navigate('EditList', {listId, title});
     }
 
     render() {

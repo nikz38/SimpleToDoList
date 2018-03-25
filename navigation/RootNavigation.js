@@ -6,6 +6,7 @@ import MainTabNavigator from './MainTabNavigator';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import LoginScreen from '../screens/LoginScreen';
 import ListScreen from '../screens/ListScreen';
+import EditListScreen from "../screens/EditListScreen";
 
 
 const RootStackNavigator = StackNavigator(
@@ -15,6 +16,9 @@ const RootStackNavigator = StackNavigator(
         },
         List: {
             screen: ListScreen
+        },
+        EditList: {
+          screen: EditListScreen
         },
         Main: {
             screen: MainTabNavigator,
