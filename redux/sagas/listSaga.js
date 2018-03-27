@@ -19,7 +19,7 @@ function* watchCreateListRequest() {
 
         function connect() {
             return new Promise(resolve => {
-                listsRef.set({title: title, items: ['item1']}, resolve);
+                listsRef.set({title: title}, resolve);
             });
         }
 
@@ -74,18 +74,12 @@ function* watchDeleteListRequest() {
 function* watchEditListRequest() {
     while (true) {
         const action = yield take(types.EDIT_LIST_REQUEST);
-        const {uid} = action.payload;
-        const listsRef = fbDatabase.ref(`lists/${uid}`);
-
-        function connect() {
-            return new Promise(resolve => {
-                listsRef.on('value', resolve);
-            });
-        }
-
+        const {uid, listId, title} = action.payload;
+        debugger
+        const listsRef = fbDatabase.ref(`lists/${uid}/${listId}`);
         try {
-            const snapshot = yield call(connect);
-            yield put(deleteListSuccess(snapshot.val()));
+            yield call([listsRef, listsRef.update], {title})
+            yield put(getListsRequest({uid}));
 
         } catch (error) {
             yield put(deleteListFailure(error));
@@ -98,6 +92,4 @@ export default function* root() {
     yield fork(watchGetListsRequest)
     yield fork(watchDeleteListRequest)
     yield fork(watchEditListRequest)
-
-
 }

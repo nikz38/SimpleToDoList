@@ -1,9 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View, Button } from 'react-native';
-import { NavigationActions } from 'react-navigation'
 import { connect } from 'react-redux';
-import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
-import { addListRequest, getListsRequest, deleteListRequest } from '../redux/actions/listActions';
+import { deleteListRequest, editListRequest } from '../redux/actions/listActions';
+import { editListItemRequest, deleteListItemRequest } from '../redux/actions/listItemActions';
 import { FormLabel, FormInput, FormValidationMessage, List, ListItem } from 'react-native-elements';
 
 class EditListScreen extends React.Component {
@@ -14,72 +13,86 @@ class EditListScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {title: ''};
+        this.state = {title: '', selectedReducer: ''};
     }
 
     componentDidMount() {
         const {title} = this.props.navigation.state.params;
-        this.setState({title})
+        this.setState({title});
+        if (this.props.navigation.state.params.listItemId) {
+            this.state.selectedReducer = this.props.listItemReducer;
+        } else {
+            this.state.selectedReducer = this.props.authReducer;
+        }
     }
 
     componentDidUpdate() {
 console.log('did update');
     }
 
-    render() {
-        const {listId} = this.props.navigation.state.params;
-        return (
-            <ScrollView>
-                <Text></Text>
-                <FormLabel>Change list title</FormLabel>
-                <FormInput
-                    autoCapitalize='none'
-                    value={this.state.title}
-                    onChangeText={title => this.setState({title})}/>
-                {/*<Button onPress={() => this.props.addListAction(this.props.authReducer.user.uid, this.state.listTitle)} title='Add new list'/>*/}
+    renderButtons() {
+        const {listId, listItemId} = this.props.navigation.state.params;
+        if (this.props.navigation.state.params.listItemId) {
+            return (
                 <View  style={styles.buttonWrapper}>
-                    <Button onPress={() => console.log('dasdadas')} icon={{name: 'save'}}
+                    <Button onPress={() => this.props.editListItemAction(this.props.authReducer.user.uid, listId, listItemId, this.state.title)} icon={{name: 'save'}}
+                            title='Save'/>
+                    <Button onPress={() => this.props.deleteListItemAction(this.props.authReducer.user.uid, listId, listItemId)} color={'red'} icon={{name: 'delete'}}
+                            title='Delete item'/>
+                </View>
+            )
+        } else {
+            return (
+                <View  style={styles.buttonWrapper}>
+                    <Button onPress={() => this.props.editListAction(this.props.authReducer.user.uid, listId, this.state.title)} icon={{name: 'save'}}
                             title='Save'/>
                     <Button onPress={() => this.props.deleteListAction(this.props.authReducer.user.uid, listId)} color={'red'} icon={{name: 'delete'}}
                             title='Delete list'/>
                 </View>
+            )
+        }
+    }
+
+    render() {
+        return (
+            <ScrollView>
+                <Text></Text>
+                <FormLabel>Change title</FormLabel>
+                <FormInput
+                    autoCapitalize='none'
+                    value={this.state.title}
+                    onChangeText={title => this.setState({title})}/>
+                {this.renderButtons()}
             </ScrollView>
         );
     }
 }
 
 function mapStateToProps(state) {
-    const {authReducer, listReducer} = state;
+    const {authReducer, listReducer, listItemReducer} = state;
     console.log(state);
     return {
         authReducer,
-        listReducer
+        listReducer,
+        listItemReducer
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        addListAction: (uid, title) => {
-            dispatch(addListRequest({uid: uid, title: title}))
-        },
-        getListsAction: (uid) => {
-            dispatch(getListsRequest({uid: uid}))
-        },
+
         deleteListAction: (uid, listId) => {
-            dispatch(deleteListRequest({uid: uid, listId: listId}))
+            dispatch(deleteListRequest({uid, listId}))
         },
-        loginAction: (email, password) => {
-            dispatch(loginRequest({email: email, password: password}))
+        editListAction: (uid, listId, title) => {
+            dispatch(editListRequest({uid, listId, title}))
         },
-        loginSuccessAction: (user) => {
-            dispatch(loginSuccess(user))
+        deleteListItemAction: (uid, listId, listItemId) => {
+            dispatch(deleteListItemRequest({uid, listId, listItemId}))
         },
-        logOutAction: () => {
-            dispatch(logoutRequest())
-        },
-        registerAction: (email, password) => {
-            dispatch(registerRequest({email: email, password: password}))
-        },
+        editListItemAction: (uid, listId, listItemId, title) => {
+            dispatch(editListItemRequest({uid, listId, listItemId, title}))
+        }
     }
 }
 

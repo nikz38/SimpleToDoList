@@ -7,6 +7,7 @@ import registerForPushNotificationsAsync from '../api/registerForPushNotificatio
 import LoginScreen from '../screens/LoginScreen';
 import ListScreen from '../screens/ListScreen';
 import EditListScreen from "../screens/EditListScreen";
+import ListItemsScreen from "../screens/ListItemsScreen";
 
 
 const RootStackNavigator = StackNavigator(
@@ -16,6 +17,9 @@ const RootStackNavigator = StackNavigator(
         },
         List: {
             screen: ListScreen
+        },
+        ListItems: {
+            screen: ListItemsScreen
         },
         EditList: {
           screen: EditListScreen
