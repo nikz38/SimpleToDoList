@@ -1,10 +1,10 @@
 import React from 'react';
-import { ScrollView, View, Button } from 'react-native';
+import { ScrollView, View, Share, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import { connect } from 'react-redux';
 import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
 import { addListRequest, getListsRequest } from '../redux/actions/listActions';
-import { FormLabel, FormInput, List, ListItem } from 'react-native-elements';
+import { FormLabel, FormInput, List, ListItem, Button } from 'react-native-elements';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -38,12 +38,19 @@ class ListScreen extends React.Component {
 
     renderLists() {
         const {lists} = this.props.listReducer;
-        return Object.keys(lists).map( (list, index) => {
-            return <ListItem
-                key={index}
-                onPress={this.listItemsScreen.bind(this,Object.keys(lists)[index], lists[list].items)}
-                onLongPress={this.longPressOptions.bind(this,Object.keys(lists)[index], lists[list].title)}
+        return Object.keys(lists).map((list, index) => {
+            return (
+             <View style={styles.listItem} key={index}>
+                <ListItem
+                    titleStyle={styles.listText}
+                onPress={this.listItemsScreen.bind(this, Object.keys(lists)[index], lists[list].items)}
+                onLongPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)}
                 title={lists[list].title}></ListItem>
+                 <Button
+                     buttonStyle={styles.shareButton}
+                     onPress={() => this.shareList(lists[list])} title='Share'/>
+             </View>
+            )
         })
     }
 
@@ -60,6 +67,15 @@ class ListScreen extends React.Component {
         this.setState({listTitle: ''})
     }
 
+    shareList(list) {
+        const itemsArray = Object.entries(list.items).map(item => item[1].title);
+        const itemsArrayString = itemsArray.toString()
+        Share.share({
+            message: `List items: ${itemsArrayString}`,
+            title: list.title
+        })
+    }
+
     render() {
         return (
             <ScrollView>
@@ -73,9 +89,12 @@ class ListScreen extends React.Component {
                 <View>
                     {this.props.authReducer.user && <Button onPress={() => this.props.logOutAction()} title='Logout'/>}
                 </View>
-                <List>
-                    {this.props.listReducer.lists && this.renderLists()}
-                </List>
+                    <List>
+                        <View style={styles.listRow}>
+
+                        {this.props.listReducer.lists && this.renderLists()}
+                        </View>
+                    </List>
             </ScrollView>
         );
     }
@@ -95,13 +114,28 @@ function mapDispatchToProps(dispatch) {
             dispatch(addListRequest({uid: uid, title: title}))
         },
         getListsAction: (uid) => {
-            dispatch(getListsRequest({uid: uid }))
+            dispatch(getListsRequest({uid: uid}))
         },
         logOutAction: () => {
             dispatch(logoutRequest())
         }
     }
 }
+
+const styles = StyleSheet.create({
+    listText: {
+        flex: 1,
+        width: 300
+    },
+    listItem: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    shareButton: {
+        width: 100
+    }
+})
 
 export default connect(
     mapStateToProps,

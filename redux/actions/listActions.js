@@ -11,6 +11,7 @@ import {
     DELETE_LIST_REQUEST,
     DELETE_LIST_FAILURE,
     DELETE_LIST_SUCCESS,
+    RESET_DELETE_PROPERTY
 } from '../types'
 
 
@@ -71,5 +72,10 @@ export const deleteListSuccess = payload => ({
 
 export const deleteListFailure = payload => ({
     type: DELETE_LIST_FAILURE,
+    payload
+})
+
+export const resetDeleteListProperty = payload => ({
+    type: RESET_DELETE_PROPERTY,
     payload
 })

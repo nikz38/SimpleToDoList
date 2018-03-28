@@ -2,7 +2,8 @@ export const initialState = {
     isFetching: false,
     failure: false,
     success: false,
-    error: null
+    error: null,
+    searchText: ''
 };
 
 export const requestState = {

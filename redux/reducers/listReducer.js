@@ -42,6 +42,17 @@ export default function listReducer(state = initialState, action) {
                 ...failureState,
                 error: action.payload.message
             }
+        case types.DELETE_LIST_SUCCESS:
+            return {
+                ...state,
+                ...failureState,
+                deleteListSuccess: true
+            }
+        case types.RESET_DELETE_PROPERTY:
+            return {
+                ...state,
+                deleteListSuccess: false
+            }
         default:
             return state
     }

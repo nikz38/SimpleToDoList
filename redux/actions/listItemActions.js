@@ -11,6 +11,8 @@ import {
     DELETE_LIST_ITEM_REQUEST,
     DELETE_LIST_ITEM_FAILURE,
     DELETE_LIST_ITEM_SUCCESS,
+    RESET_DELETE_PROPERTY,
+    SEARCH_TEXT_REQUEST
 } from '../types'
 
 export const getListItemsRequest = payload => ({
@@ -70,5 +72,15 @@ export const deleteListItemSuccess = payload => ({
 
 export const deleteListItemFailure = payload => ({
     type: DELETE_LIST_ITEM_FAILURE,
+    payload
+})
+
+export const resetDeleteListItemProperty = payload => ({
+    type: RESET_DELETE_PROPERTY,
+    payload
+})
+
+export const searchTextRequest = payload => ({
+    type: SEARCH_TEXT_REQUEST,
     payload
 })

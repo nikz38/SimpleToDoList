@@ -59,6 +59,7 @@ function* watchDeleteListItemRequest() {
         try {
             yield call([listItemRef, listItemRef.remove])
             yield put(getListItemsRequest({uid, listId}));
+            yield put(deleteListItemSuccess());
 
         } catch (error) {
             yield put(deleteListItemFailure(error));
@@ -69,13 +70,14 @@ function* watchDeleteListItemRequest() {
 function* watchEditListItemRequest() {
     while (true) {
         const action = yield take(types.EDIT_LIST_ITEM_REQUEST);
-        const {uid, listId, listItemId, title, isChecked} = action.payload;
+        const {uid, listId, listItemId, updateProps} = action.payload;
         const listItemRef = fbDatabase.ref(`lists/${uid}/${listId}/items/${listItemId}`);
 
+
         try {
-            title ? yield call([listItemRef, listItemRef.update], {title}):
-            yield call([listItemRef, listItemRef.update], {isChecked})
+            yield call([listItemRef, listItemRef.update], updateProps);
             yield put(getListItemsRequest({uid, listId}));
+            yield put(deleteListItemSuccess());
 
         } catch (error) {
             yield put(deleteListItemFailure(error));

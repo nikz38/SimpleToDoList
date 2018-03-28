@@ -68,7 +68,8 @@ export default function listItemReducer(state = initialState, action) {
             return {
                 ...state,
                 ...successState,
-                data: action.payload
+                data: action.payload,
+                deleteListItemSuccess: true
             }
         case types.DELETE_LIST_ITEM_FAILURE:
             return {
@@ -76,7 +77,16 @@ export default function listItemReducer(state = initialState, action) {
                 ...failureState,
                 error: action.payload.message
             }
-
+        case types.RESET_DELETE_PROPERTY:
+            return {
+                ...state,
+                deleteListItemSuccess: false
+            }
+        case types.SEARCH_TEXT_REQUEST:
+            return {
+                ...state,
+                searchText: action.payload.text
+            }
         default:
             return state
     }
