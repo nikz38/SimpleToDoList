@@ -19,7 +19,7 @@ function* watchCreateListItemRequest() {
         const listItemRef = fbDatabase.ref(`lists/${uid}/${listId}/items/`);
 
         try {
-            yield call([listItemRef, listItemRef.push], {title, isChecked: false})
+            yield call([listItemRef, listItemRef.push], {title, isChecked: false, image: null})
 
             yield put(getListItemsRequest({uid, listId}));
         } catch (error) {

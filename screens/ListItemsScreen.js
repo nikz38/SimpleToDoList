@@ -1,9 +1,14 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import { connect } from 'react-redux';
-import { addListItemRequest, getListItemsRequest, editListItemRequest, searchTextRequest } from '../redux/actions/listItemActions';
-import { FormLabel, FormInput, List, ListItem, Button } from 'react-native-elements';
+import {
+    addListItemRequest,
+    getListItemsRequest,
+    editListItemRequest,
+    searchTextRequest
+} from '../redux/actions/listItemActions';
+import { FormInput, List, ListItem, Button } from 'react-native-elements';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -23,11 +28,6 @@ class ListItemsScreen extends React.Component {
         this.itemStyle = this.itemStyle.bind(this)
     }
 
-    // componentDidMount() {
-    //     this.props.getListsAction(this.props.authReducer.user.uid)
-    //
-    // }
-
     componentDidMount() {
         const {listId} = this.props.navigation.state.params;
         this.setState({listId})
@@ -44,18 +44,36 @@ class ListItemsScreen extends React.Component {
         const {items, searchText} = this.props.listItemReducer;
         let filteredObject = {}
         const filteredObjectToArray = Object.entries(items).filter((item) => item[1].title.startsWith(searchText));
-        filteredObjectToArray.map(([key, val]) => ([key, val])).reduce((obj, [k, v]) => Object.assign(filteredObject, { [k]: v }), {})
+        console.log(filteredObjectToArray);
+
+        filteredObjectToArray.map(([key, val]) => ([key, val])).reduce((obj, [k, v]) => Object.assign(filteredObject, {[k]: v}), {})
 
         return Object.keys(filteredObject).map((item, index) => {
             return (
                 <View style={styles.itemRow} key={index}>
-                    <View style={styles.listItem}>
-                        <ListItem
-                            hideChevron={true}
-                            titleStyle={this.itemStyle(filteredObject[item].isChecked)}
-                            onLongPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
-                            title={filteredObject[item].title}>
-                        </ListItem>
+                    <View style={styles.listItemWrapper}>
+                        {filteredObject[item].image ?
+                            <ListItem
+                                roundAvatar
+                                avatar={{uri: filteredObject[item].image}}
+                                hideChevron={true}
+                                titleContainerStyle={styles.listItemText}
+                                containerStyle={styles.listItem}
+                                titleStyle={this.itemStyle(filteredObject[item].isChecked)}
+                                onLongPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
+                                title={filteredObject[item].title}>
+                            </ListItem>
+                            :
+                            <ListItem
+                                hideChevron={true}
+                                titleContainerStyle={styles.listItemText}
+                                containerStyle={styles.listItem}
+                                titleStyle={this.itemStyle(filteredObject[item].isChecked)}
+                                onLongPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
+                                title={filteredObject[item].title}>
+                            </ListItem>
+                        }
+
                     </View>
                     <Button buttonStyle={styles.checkButton}
                             onPress={() => this.checkItem(Object.keys(filteredObject)[index], filteredObject[item].isChecked)}
@@ -86,35 +104,53 @@ class ListItemsScreen extends React.Component {
                 textDecorationStyle: "solid",
                 textDecorationColor: "#000",
             }
+        } else {
+
         }
     }
 
     render() {
+        {
+            if (this.props.listItemReducer.isFetching) {
+                return (
+                    <View style={[styles.containerLoader, styles.horizontal]}>
+                        <ActivityIndicator size="large" color="#0000ff"/>
+                    </View>
+                )
+            } else {
         return (
             <ScrollView style={styles.wrapper}>
-                <FormLabel>Add new item</FormLabel>
-                <View style={styles.formWrapper}>
-                    <View style={styles.form}>
-                    <FormInput
-                        autoCapitalize='none'
-                        value={this.state.newItem}
-                        placeholder='grocery list'
-                        onChangeText={newItem => this.setState({newItem})}/>
+                <View style={styles.addListWrapper}>
+                    <View style={styles.formWrapper}>
+                        <FormInput
+                            inputStyle={styles.formInput}
+                            containerStyle={styles.form}
+                            autoCapitalize='none'
+                            value={this.state.newItem}
+                            placeholder='add new item to the list'
+                            onChangeText={newItem => this.setState({newItem})}/>
                     </View>
-                    <Button style={styles.addButton} onPress={() => this.addNewListItem()} title='Add'/>
-                    <View style={styles.form}>
+                    <Button disabled={!this.state.newItem} buttonStyle={styles.addButton}
+                            onPress={() => this.addNewListItem()} title='Add'/>
+                </View>
+                <View style={styles.form}>
                     <FormInput
+                        containerStyle={styles.filterStyle}
                         autoCapitalize='none'
+                        placeholder='filter list'
                         value={this.props.listItemReducer.searchText}
                         onChangeText={searchText => this.props.searchTextAction(searchText)}/>
-                    </View>
-                    {/*<Button style={styles.addButton} onPress={() => this.filterItems()} title='filter'/>*/}
                 </View>
-                <List style={styles.list}>
+
+                <List containerStyle={styles.list}>
                     {this.props.listItemReducer.items && this.renderList()}
                 </List>
             </ScrollView>
         );
+            }
+
+        }
+
     }
 }
 
@@ -150,32 +186,63 @@ const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
     },
-    formWrapper: {
-        justifyContent: 'space-between',
+    addListWrapper: {
         flexDirection: 'row',
+    },
+    containerLoader: {
         flex: 1,
+        justifyContent: 'center'
+    },
+    horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10
+    },
+    formWrapper: {
+        marginTop: 20,
+        flex: 1,
+    },
+    addButton: {
+        marginTop: 14,
+        backgroundColor: '#51a5e3'
+    },
+
+    filterStyle: {
+        marginTop: 15,
+        marginBottom: 15
+    },
+
+    list: {
+        flex: 1,
+        marginTop: 10,
+        borderTopWidth: 0
+    },
+
+    listItemWrapper: {
+        flex: 1,
+        flexDirection: 'row',
+    },
+    listItem: {
+        marginLeft: 17,
+        flex: 1,
+    },
+    listItemText: {
+        height: 20,
+        marginTop: 10
     },
     form: {
         flex: 1,
     },
-    addButton: {
-        flex: 1,
-        width: 100
-    },
+
     itemRow: {
         flexDirection: 'row',
         flex: 1,
         backgroundColor: '#f0f0f5'
     },
-    list: {
-        flex: 1,
-    },
-    listItem: {
-        flex: 1,
-        justifyContent: 'space-between',
-    },
     checkButton: {
-        width: 100
+        marginTop: 5,
+        width: 100,
+        backgroundColor: '#8ac24a'
     }
 })
 

@@ -1,10 +1,11 @@
 import React from 'react';
-import { ScrollView, View, Share, StyleSheet } from 'react-native';
+import { ScrollView, View, Share, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import { connect } from 'react-redux';
-import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
+import { logoutRequest } from '../redux/actions/authActions';
 import { addListRequest, getListsRequest } from '../redux/actions/listActions';
-import { FormLabel, FormInput, List, ListItem, Button } from 'react-native-elements';
+import { FormInput, List, ListItem, Button } from 'react-native-elements';
+
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -40,16 +41,18 @@ class ListScreen extends React.Component {
         const {lists} = this.props.listReducer;
         return Object.keys(lists).map((list, index) => {
             return (
-             <View style={styles.listItem} key={index}>
-                <ListItem
-                    titleStyle={styles.listText}
-                onPress={this.listItemsScreen.bind(this, Object.keys(lists)[index], lists[list].items)}
-                onLongPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)}
-                title={lists[list].title}></ListItem>
-                 <Button
-                     buttonStyle={styles.shareButton}
-                     onPress={() => this.shareList(lists[list])} title='Share'/>
-             </View>
+                <View style={styles.listItemWrapper} key={index}>
+                    <ListItem
+                        hideChevron={true}
+                        titleContainerStyle={styles.listItemText}
+                        containerStyle={styles.listItem}
+                        onPress={this.listItemsScreen.bind(this, Object.keys(lists)[index], lists[list].items)}
+                        onLongPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)}
+                        title={lists[list].title}></ListItem>
+                    <Button
+                        buttonStyle={styles.shareButton}
+                        onPress={() => this.shareList(lists[list])} title='Share'/>
+                </View>
             )
         })
     }
@@ -77,26 +80,45 @@ class ListScreen extends React.Component {
     }
 
     render() {
-        return (
-            <ScrollView>
-                <FormLabel>Add new list</FormLabel>
-                <FormInput
-                    autoCapitalize='none'
-                    value={this.state.listTitle}
-                    placeholder='grocery list'
-                    onChangeText={listTitle => this.setState({listTitle})}/>
-                <Button onPress={() => this.addNewList()} title='Add new list'/>
-                <View>
-                    {this.props.authReducer.user && <Button onPress={() => this.props.logOutAction()} title='Logout'/>}
-                </View>
-                    <List>
-                        <View style={styles.listRow}>
-
-                        {this.props.listReducer.lists && this.renderLists()}
+        {
+            if (this.props.listReducer.isFetching) {
+                return (
+                    <View style={[styles.containerLoader, styles.horizontal]}>
+                        <ActivityIndicator size="large" color="#0000ff"/>
+                    </View>
+                )
+            } else {
+                return (
+                    <ScrollView style={styles.container}>
+                        <View style={styles.addListWrapper}>
+                            <View style={styles.formWrapper}>
+                                <FormInput
+                                    inputStyle={styles.formInput}
+                                    containerStyle={styles.form}
+                                    autoCapitalize='none'
+                                    value={this.state.listTitle}
+                                    placeholder='add new list'
+                                    onChangeText={listTitle => this.setState({listTitle})}/>
+                            </View>
+                            <Button disabled={!this.state.listTitle} buttonStyle={styles.addButton}
+                                    onPress={() => this.addNewList()} title='Add new list'/>
                         </View>
-                    </List>
-            </ScrollView>
-        );
+                        <List containerStyle={styles.list}>
+                            <View style={styles.listRow}>
+                                {this.props.listReducer.lists && this.renderLists()}
+                            </View>
+                        </List>
+                        <View>
+                            {this.props.authReducer.user &&
+                            <Button buttonStyle={styles.logoutButton} onPress={() => this.props.logOutAction()}
+                                    title='Logout'/>}
+                        </View>
+                    </ScrollView>
+                );
+            }
+
+        }
+
     }
 }
 
@@ -123,17 +145,59 @@ function mapDispatchToProps(dispatch) {
 }
 
 const styles = StyleSheet.create({
-    listText: {
-        flex: 1,
-        width: 300
+    container: {
+        backgroundColor: '#fff'
     },
-    listItem: {
+    containerLoader: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10
+    },
+    addListWrapper: {
+        flexDirection: 'row',
+    },
+    formWrapper: {
+        marginTop: 20,
+        flex: 1,
+    },
+    form: {},
+    formInput: {},
+    addButton: {
+        marginTop: 14,
+        backgroundColor: '#51a5e3'
+    },
+    list: {
+        flex: 1,
+        marginTop: 50,
+        marginBottom: 50,
+        borderTopWidth: 0
+    },
+    listItemText: {
+        marginTop: 15
+
+    },
+    listRow: {
+        flex: 1,
+    },
+    listItemWrapper: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+    },
+    listItem: {
+        marginLeft: 17,
+        flex: 1,
     },
     shareButton: {
-        width: 100
+        marginTop: 14,
+        width: 100,
+        backgroundColor: '#8ac24a'
+    },
+    logoutButton: {
+        backgroundColor: '#ff5723'
     }
 })
 
