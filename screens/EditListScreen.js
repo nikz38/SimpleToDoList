@@ -247,7 +247,16 @@ const styles = StyleSheet.create({
     },
     pickerWrapper: {
         flex: 1
-    }
+    },
+    containerLoader: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10
+    },
 })
 
 export default connect(
