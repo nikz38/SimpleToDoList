@@ -50,9 +50,11 @@ class ListScreen extends React.Component {
                         title={lists[list].title}></ListItem>
                     <Button
                         buttonStyle={styles.shareButton}
+                        textStyle={styles.buttonTextStyle}
                         onPress={() => this.shareList(lists[list])} title='Share'/>
                     <Button
                         buttonStyle={styles.shareButton}
+                        textStyle={styles.buttonTextStyle}
                         onPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)} title='Edit'/>
                 </View>
             )
@@ -201,6 +203,9 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         backgroundColor: '#ff5723'
+    },
+    buttonTextStyle: {
+        fontSize: 12
     }
 })
 

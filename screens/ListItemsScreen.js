@@ -249,8 +249,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#8ac24a'
     },
     checkButtonText: {
-        fontSize: 12,
-
+        fontSize: 12
     }
 })
 
