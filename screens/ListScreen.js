@@ -47,11 +47,13 @@ class ListScreen extends React.Component {
                         titleContainerStyle={styles.listItemText}
                         containerStyle={styles.listItem}
                         onPress={this.listItemsScreen.bind(this, Object.keys(lists)[index], lists[list].items)}
-                        onLongPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)}
                         title={lists[list].title}></ListItem>
                     <Button
                         buttonStyle={styles.shareButton}
                         onPress={() => this.shareList(lists[list])} title='Share'/>
+                    <Button
+                        buttonStyle={styles.shareButton}
+                        onPress={this.longPressOptions.bind(this, Object.keys(lists)[index], lists[list].title)} title='Edit'/>
                 </View>
             )
         })
@@ -189,11 +191,12 @@ const styles = StyleSheet.create({
     },
     listItem: {
         marginLeft: 17,
-        flex: 1,
+        flex: 1
     },
     shareButton: {
+        flex: 1,
         marginTop: 14,
-        width: 100,
+        width: 70,
         backgroundColor: '#8ac24a'
     },
     logoutButton: {

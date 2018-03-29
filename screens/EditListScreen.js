@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, Button, ActivityIndicator, Picker } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, ActivityIndicator, Picker } from 'react-native';
 import { connect } from 'react-redux';
 import { deleteListRequest, editListRequest } from '../redux/actions/listActions';
 import {
@@ -8,7 +8,7 @@ import {
     resetDeleteListItemProperty
 } from '../redux/actions/listItemActions';
 import { NavigationActions } from 'react-navigation';
-import { FormLabel, FormInput } from 'react-native-elements';
+import { FormLabel, FormInput, Button } from 'react-native-elements';
 import { ImagePicker } from 'expo';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
@@ -139,12 +139,13 @@ class EditListScreen extends React.Component {
             return (
                 <View style={styles.buttonWrapper}>
                     <Button
+                        buttonStyle={styles.saveButton}
                         onPress={() => this.props.editListItemAction(this.props.authReducer.user.uid, listId, listItemId, this.state.title)}
                         icon={{name: 'save'}}
                         title='Save'/>
                     <Button
+                        buttonStyle={styles.deleteButton}
                         onPress={() => this.props.deleteListItemAction(this.props.authReducer.user.uid, listId, listItemId)}
-                        color={'red'} icon={{name: 'delete'}}
                         title='Delete item'/>
 
                 </View>
@@ -153,11 +154,12 @@ class EditListScreen extends React.Component {
             return (
                 <View style={styles.buttonWrapper}>
                     <Button
+                        buttonStyle={styles.saveButton}
                         onPress={() => this.props.editListAction(this.props.authReducer.user.uid, listId, this.state.title)}
                         icon={{name: 'save'}}
                         title='Save'/>
                     <Button onPress={() => this.props.deleteListAction(this.props.authReducer.user.uid, listId)}
-                            color={'red'} icon={{name: 'delete'}}
+                            buttonStyle={styles.deleteButton}
                             title='Delete list'/>
                 </View>
             )
@@ -184,13 +186,14 @@ class EditListScreen extends React.Component {
 
                         {!this.state.contacts && this.props.navigation.state.params.listItemId &&
                         <Button onPress={() => this.showFirstContactAsync()}
+                                buttonStyle={styles.addContactsButton}
                                 title='Add from contacts for who is this item'/>}
 
                         {this.state.contacts && this.props.navigation.state.params.listItemId &&
-                        <Button onPress={() => this.setState({contacts: null})} title='close contacts'/>}
+                        <Button buttonStyle={styles.closeContactsButton} onPress={() => this.setState({contacts: null})} title='close contacts'/>}
 
                         {this.props.navigation.state.params.listItemId &&
-                        <Button onPress={() => this.onOpenActionSheet()} title='add image'/>}
+                        <Button buttonStyle={styles.addPropsButton} onPress={() => this.onOpenActionSheet()} title='add image'/>}
 
                         {this.state.contacts && this.renderPicker()}
 
@@ -257,6 +260,31 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 10
     },
+    addPropsButton: {
+        marginTop: 20,
+        flex: 1,
+        backgroundColor: '#8ac24a'
+    },
+    deleteButton: {
+        marginTop: 20,
+        flex: 1,
+        backgroundColor: '#ff5723'
+    },
+    saveButton: {
+        marginTop: 20,
+        flex: 1,
+        backgroundColor: '#51a5e3'
+    },
+    addContactsButton: {
+        marginTop: 20,
+        flex: 1,
+        backgroundColor: '#8ac24a'
+    },
+    closeContactsButton: {
+        marginTop: 20,
+        flex: 1,
+        backgroundColor: '#ff5723'
+    }
 })
 
 export default connect(

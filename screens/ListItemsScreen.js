@@ -60,7 +60,6 @@ class ListItemsScreen extends React.Component {
                                 titleContainerStyle={styles.listItemText}
                                 containerStyle={styles.listItem}
                                 titleStyle={this.itemStyle(filteredObject[item].isChecked)}
-                                onLongPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
                                 title={filteredObject[item].title}>
                             </ListItem>
                             :
@@ -69,15 +68,19 @@ class ListItemsScreen extends React.Component {
                                 titleContainerStyle={styles.listItemText}
                                 containerStyle={styles.listItem}
                                 titleStyle={this.itemStyle(filteredObject[item].isChecked)}
-                                onLongPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
                                 title={filteredObject[item].title}>
                             </ListItem>
                         }
 
                     </View>
                     <Button buttonStyle={styles.checkButton}
+                            textStyle={styles.checkButtonText}
                             onPress={() => this.checkItem(Object.keys(filteredObject)[index], filteredObject[item].isChecked)}
                             title={filteredObject[item].isChecked ? 'uncheck' : 'check'}/>
+                    <Button buttonStyle={styles.checkButton}
+                            textStyle={styles.checkButtonText}
+                            onPress={this.longPressOptions.bind(this, this.state.listId, Object.keys(filteredObject)[index], filteredObject[item].title)}
+                            title='edit'/>
                 </View>
             )
         })
@@ -225,6 +228,7 @@ const styles = StyleSheet.create({
     listItem: {
         marginLeft: 17,
         flex: 1,
+        width: 500
     },
     listItemText: {
         height: 20,
@@ -241,8 +245,12 @@ const styles = StyleSheet.create({
     },
     checkButton: {
         marginTop: 5,
-        width: 100,
+        width: 80,
         backgroundColor: '#8ac24a'
+    },
+    checkButtonText: {
+        fontSize: 12,
+
     }
 })
 

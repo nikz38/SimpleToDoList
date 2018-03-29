@@ -2,7 +2,6 @@ import { Notifications } from 'expo';
 import React from 'react';
 import { StackNavigator } from 'react-navigation';
 
-import MainTabNavigator from './MainTabNavigator';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import LoginScreen from '../screens/LoginScreen';
 import ListScreen from '../screens/ListScreen';
@@ -23,9 +22,6 @@ const RootStackNavigator = StackNavigator(
         },
         EditList: {
           screen: EditListScreen
-        },
-        Main: {
-            screen: MainTabNavigator,
         }
 
     },

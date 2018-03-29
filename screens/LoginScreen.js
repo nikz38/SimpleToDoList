@@ -1,23 +1,9 @@
 import React from 'react';
-import {
-    Image,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    Button,
-    View,
-} from 'react-native';
-
+import { ActivityIndicator, Text, Button, View, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import * as firebase from 'firebase';
-import MainTabNavigator from '../navigation/MainTabNavigator';
-import { StackNavigator } from 'react-navigation';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
-
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { addListItemRequest } from '../redux/actions/listActions';
 import List from '../screens/ListScreen'
 import { loginRequest, loginSuccess, logoutRequest, registerRequest } from '../redux/actions/authActions';
@@ -30,12 +16,10 @@ const resetAction = NavigationActions.reset({
     ]
 });
 
-
 class LoginScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {email: '', password: ''};
-
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 if (!this.props.authReducer.user) {
@@ -49,10 +33,6 @@ class LoginScreen extends React.Component {
     }
 
     renderButtonOrLoading() {
-        if (this.props.authReducer.isFetching) {
-            return <Text>Loading...</Text>
-        }
-
         return (
             <View>
                 {!this.props.authReducer.user &&
@@ -66,6 +46,14 @@ class LoginScreen extends React.Component {
     }
 
     render() {
+        {
+            if (this.props.authReducer.isFetching) {
+                return (
+                    <View style={[styles.containerLoader, styles.horizontal]}>
+                        <ActivityIndicator size="large" color="#0000ff"/>
+                    </View>
+                )
+            } else {
         return (
             <View>
                 <FormLabel>Email</FormLabel>
@@ -90,12 +78,15 @@ class LoginScreen extends React.Component {
                 </Text>}
             </View>
         )
+            }
+
+        }
+
     }
 }
 
 function mapStateToProps(state) {
     const {authReducer} = state;
-    console.log(state);
     return {
         authReducer
     }
@@ -117,6 +108,18 @@ function mapDispatchToProps(dispatch) {
         },
     }
 }
+
+const styles = StyleSheet.create({
+    containerLoader: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10
+    },
+})
 
 export default connect(
     mapStateToProps,
